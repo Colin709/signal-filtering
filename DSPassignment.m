@@ -25,7 +25,7 @@ grid on
 plot (time,voltage)
 title('Guitar String Waveform')
 xlabel('Time (seconds)'); ylabel('Voltage (mV)')
-title('Voltage vs time of E2 Signal')
+title('Voltage vs time')
 
 % calculate and plot the frequency spectrum
 [PowerSD,fhz,estimated_freq] = spectral_analysis(fsamp,voltage);
