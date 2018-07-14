@@ -1,3 +1,0 @@
-DSPassignment.asv
-LastSetup.mat
-notused.m
