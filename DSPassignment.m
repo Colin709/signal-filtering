@@ -49,7 +49,12 @@ legend('Original Signal','Filtered Data')
 %consider breaking this into separate functions for input and load
 function [got_signal, filter_bounds, get_filter, cutoff_frequency, IIR_order] = userinput()
 %prompt user to load a signal file (has to be in working directory)
-prompt = 'Which signal file would you like to load? (do not include .txt) \n-press enter for previous config \n-type "dir" to view available files\n\n';
+prompt = ['Which signal file would you like to load? \nOptions: ' ...
+    '\n-press enter for previous config ' ...
+    '\n-type "dir" to view available files ' ...
+    '\nNOTES: ' ...
+    '\n-signal files should be in "signals" subdirectory ' ...
+    '\n-type the file name without the directory or .txt\n\n '];
 get_signal = input(prompt,'s');
 if strcmp(get_signal,'dir')
     while 1
@@ -64,7 +69,7 @@ if strcmp(get_signal,'')
    load('LastSetup.mat','got_signal','filter_bounds','get_filter','cutoff_frequency', 'IIR_order')
    return 
 end 
-got_signal = load([get_signal,'.txt']);
+got_signal = load(['signals/',get_signal,'.txt']);
 
 %prompt user to specify FIR or IIR Filter
 prompt = '\nWould you like to use a FIR or IIR filter?: ';
