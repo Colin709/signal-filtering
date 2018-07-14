@@ -13,10 +13,10 @@ close all; clear; clc;
 %process the signal file
 [time,voltage,rowsize,colsize] = process_signal(theSignal);
 
-%call function to calculate sampling rate
+%calculate sampling rate
 [fsamp,nyquist] = samplerate(time,rowsize);
 
-%Call function to design filter
+%design filter the filter
 theFilter = design_filter(filter_response,filter_type,fc,fsamp,order);
 
 % plot the voltages and time
@@ -46,6 +46,7 @@ ylabel('Amplitude (mV)')
 legend('Original Signal','Filtered Data')
 
 %function to take user input for signal file and filter type
+%consider breaking this into separate functions for input and load
 function [got_signal, filter_bounds, get_filter, cutoff_frequency, IIR_order] = userinput()
 %prompt user to load a signal file (has to be in working directory)
 prompt = 'Which signal file would you like to load? (do not include .txt) \n-press enter for previous config \n-type "dir" to view available files\n\n';
@@ -95,18 +96,6 @@ IIR_order = input(prompt);
 
 %save local variables for future use
 save('LastSetup.mat','got_signal','filter_bounds','get_filter','cutoff_frequency', 'IIR_order')
-
-%Differentiate between FIR and IIR
-% if strcmp(filter_bounds,'FIR')
-%     prompt = '\nWhich FIR filter would you like to use?(LPF,HPF,BPF,BSF): ';
-%     get_filter = input(prompt,'s');
-%     IIR_order = 0;
-% elseif strcmp(filter_bounds,'IIR')
-%     prompt = '\nWhich IIR filter would you like to use?(LPF,HPF,BPF,BSF): ';
-%     get_filter = input(prompt,'s');
-% else
-%     error('Error: not a valid filter')
-% end 
 end 
 
 %function to process signal file, make adjustments to time and voltage
