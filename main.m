@@ -9,14 +9,15 @@
 close all; clear; clc;
 
 %user input
-[input_signal,filter_bounds,filter_response,fc,sigma,ripple] = userinput();
+[input_signal,filter_bounds,filter_method,filter_response, ...
+    fc,sigma,ripple] = userinput();
 
 %process the signal file and assign values to the Signal Class
 mySignal = signal_class(input_signal);
 
 %design the filter
-myFilter = ...
-    filter_class(filter_bounds,filter_response,fc,mySignal.sampling_f,sigma,ripple);
+myFilter = filter_class(filter_bounds,filter_method,filter_response, ...
+    fc,mySignal.sampling_f,sigma,ripple);
 
 % plot the voltages and time
 subplot(2,1,1)

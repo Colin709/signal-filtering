@@ -11,6 +11,7 @@ classdef filter_class
     
     properties
         type
+        method
         response
         cutoff_f
         order
@@ -21,10 +22,12 @@ classdef filter_class
     methods (Static)
         
         function obj = ...
-                filter_class(fir_or_iir,filt_response,cutf,sampf,ord,rip)
+                filter_class(fir_or_iir,design_method,filt_response, ...
+                cutf,sampf,ord,rip)
             %FILTER_CLASS Construct an instance of this class
             
             obj.type = fir_or_iir;
+            obj.method = design_method;
             obj.response =  filt_response;
             obj.cutoff_f = cutf;
             obj.order = ord;
@@ -58,7 +61,7 @@ classdef filter_class
                     else
                         error('the specified filter is invalid. Exiting..')
                     end
-                    
+
                 case 'IIR'
                     if  strcmp(filt_response,'LPF')
                         obj.designed_filter = designfilt('lowpassiir', ...
@@ -76,6 +79,7 @@ classdef filter_class
                         obj.designed_filter = designfilt('bandstopiir', ...
                             'FilterOrder',ord, 'HalfPowerFrequency1',cutf(1),...
                             'HalfPowerFrequency2',cutf(2),'SampleRate',sampf);
+                            %'DesignMethod',design_method);
                     else
                         error('the specified filter is invalid. Exiting..')
                     end

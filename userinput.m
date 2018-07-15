@@ -1,5 +1,5 @@
-function [got_signal,IIR_FIR,get_filter,cutoff_frequency,the_order,the_ripple] ...
-    = userinput()
+function [got_signal,IIR_FIR,design, ...
+    get_filter,cutoff_frequency,the_order,the_ripple] = userinput()
 %function to take user input for signal file and filter type
 %consider breaking this into separate functions for input and load
 
@@ -28,11 +28,18 @@ end
 got_signal = load([get_signal,'.txt']);
 
 %prompt user to specify FIR or IIR Filter
-prompt = '\nWould you like to use a FIR or IIR filter?: ';
+prompt = ['\nWould you like to use a FIR or IIR filter? ' ...
+    '\na kaiser window filter will be used if choosing FIR\n\n '];
 IIR_FIR = input(prompt,'s');
 if ~strcmp(IIR_FIR,'FIR') && ~strcmp(IIR_FIR,'IIR')
     error('Error: ya gotta specify FIR or IIR')
 end
+if strcmp(IIR_FIR,'IIR') 
+    prompt = '\n\Which IIR filter design method?: ';
+    design = input(prompt,'s');
+else 
+    design = [];
+end 
 
 %prompt user for filter type
 prompt = '\nWhich filter would you like to use?(LPF,HPF,BPF,BSF): ';
@@ -58,7 +65,7 @@ the_order = input(prompt);
 %specify a ripple only if IIR
 if strcmp(IIR_FIR,'IIR')
     prompt = '\nWhat is the ripple of the filter?: ';
-    the_ripple = input(prompt,'s');
+    the_ripple = input(prompt);
 else 
     the_ripple = [];
 end 
