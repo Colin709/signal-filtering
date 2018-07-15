@@ -6,48 +6,49 @@
 % July 13, 2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% 
 close all; clear; clc;
 
 %user input
-[input_signal,filter_response,filter_type,fc,order] = userinput();
+[input_signal,filter_bounds,filter_response,fc,sigma,ripple] = userinput();
 
 %process the signal file and assign values to the Signal Class
 mySignal = signal_class(input_signal);
-%% 
 
 %design the filter
-theFilter = design_filter(filter_response,filter_type,fc,fsamp,order);
+myFilter = ...
+    filter_class(filter_bounds,filter_response,fc,mySignal.sampling_f,sigma,ripple);
 
 % plot the voltages and time
 subplot(2,1,1)
 grid on
-plot (time,voltage)
-title('Guitar String Waveform')
+plot (mySignal.time,mySignal.voltage)
+title('Original Signal Waveform')
 xlabel('Time (seconds)'); ylabel('Voltage (mV)')
 title('Voltage vs time')
 
-% calculate and plot the frequency spectrum
-[PowerSD,fhz,estimated_freq] = mySignal.spectral_analysis(fsamp,voltage);
+% plot the frequency spectrum
 subplot(2,1,2)
-plot(fhz,PowerSD)
-title(['estimated freq: ',num2str(estimated_freq),' hz'])
+plot(mySignal.sampled_f,mySignal.PSD)
+title(['estimated frequency: ',num2str(mySignal.estimated_f),' hz'])
 xlabel('Frequency (Hz)'); ylabel('PSD')
 
 %Use fvtool to show frequency response
-response = fvtool(theFilter,'FS',fsamp);
+response = fvtool(myFilter.designed_filter,'FS',mySignal.sampling_f);
 
 %apply filter and plot
-filtered_signal = filter(theFilter,voltage);
-plot(time,voltage,time,filtered_signal)
+filtered_signal = filter(myFilter.designed_filter,mySignal.voltage);
+plot(mySignal.time,mySignal.voltage,mySignal.time,filtered_signal)
 xlim([0 1])
 xlabel('Time (s)')
 ylabel('Amplitude (mV)')
 legend('Original Signal','Filtered Data')
 
+
+function [got_signal,IIR_FIR,get_filter,cutoff_frequency,the_order,the_ripple] ...
+    = userinput()
 %function to take user input for signal file and filter type
 %consider breaking this into separate functions for input and load
-function [got_signal, filter_bounds, get_filter, cutoff_frequency, IIR_order] = userinput()
+
 %prompt user to load a signal file (has to be in working directory)
 prompt = ['Which signal file would you like to load? \nOptions: ' ...
     '\n-press enter for previous config ' ...
@@ -66,15 +67,16 @@ if strcmp(get_signal,'dir')
     end
 end
 if strcmp(get_signal,'')
-    load('LastSetup.mat','got_signal','filter_bounds','get_filter','cutoff_frequency', 'IIR_order')
+    load('LastSetup.mat','got_signal','IIR_FIR','get_filter', ...
+        'cutoff_frequency','the_order','the_ripple')
     return
 end
 got_signal = load([get_signal,'.txt']);
 
 %prompt user to specify FIR or IIR Filter
 prompt = '\nWould you like to use a FIR or IIR filter?: ';
-filter_bounds = input(prompt,'s');
-if ~strcmp(filter_bounds,'FIR') && ~strcmp(filter_bounds,'IIR')
+IIR_FIR = input(prompt,'s');
+if ~strcmp(IIR_FIR,'FIR') && ~strcmp(IIR_FIR,'IIR')
     error('Error: ya gotta specify FIR or IIR')
 end
 
@@ -97,89 +99,20 @@ end
 
 %prompt user to specify order
 prompt = '\nWhat is the order of the filter?: ';
-IIR_order = input(prompt);
+the_order = input(prompt);
+
+%specify a ripple only if IIR
+if strcmp(IIR_FIR,'IIR')
+    prompt = '\nWhat is the ripple of the filter?: ';
+    the_ripple = input(prompt,'s');
+else 
+    the_ripple = [];
+end 
 
 %save local variables for future use
-save('LastSetup.mat','got_signal','filter_bounds','get_filter','cutoff_frequency', 'IIR_order')
+save('LastSetup.mat','got_signal','IIR_FIR','get_filter', ...
+    'cutoff_frequency','the_order','the_ripple')
 end
 
-%function to process signal file, make adjustments to time and voltage
-% function [adjustedTime,adjustedVoltage,rows,cols] = process_signal(chosen_file)
-% % Access the time and voltage in columns 1 and 2
-% time_ = chosen_file(: , 1);
-% voltage_ = chosen_file(: , 2);
-%
-% % Retrieve number of rows and columns
-% [rows,cols] = size(chosen_file);
-%
-% % Adjust time to start at 0 and v to be in mV
-% adjustedTime = time_ - time_(1);
-% adjustedVoltage = voltage_*1000;
-% end
-%
-% %function to get sample rate (as frequency)
-% function [sample_frequency,nyquist_frequency] = samplerate(sampleTime,sampleRows)
-% Nsamps = sampleRows;
-% Tsamp = max(sampleTime)/Nsamps;
-% sample_frequency = 1/Tsamp;
-% nyquist_frequency = sample_frequency/2;
-% %t = (0:Nsamps-1)*Tsamp;
-% end
-%
-% %function to calculate PSD using FFT
-% function [Pxx,f,signalf_estimate] = spectral_analysis(freq_samp,volty)
-% % Choose FFT size and calculate spectrum
-% Nfft = 2048;
-% [Pxx,f] = pwelch(volty,gausswin(Nfft),Nfft/2,Nfft,freq_samp);
-%
-% % Get frequency estimate (spectral peak)
-% [~,loc] = max(Pxx);
-% signalf_estimate = f(loc);
-% end
 
-function filter_name = design_filter(fir_or_iir,theFilter,cutf,sampf,iir_order)
-%Design Filters
-switch fir_or_iir
-    case 'FIR'
-        if  strcmp(theFilter,'LPF')
-            filter_name = designfilt('lowpassfir','FilterOrder',20,'CutoffFrequency',...
-                cutf,'DesignMethod','window','Window',{@kaiser,3},'SampleRate',sampf);
-        elseif strcmp(theFilter,'HPF')
-            filter_name = designfilt('highpassfir','FilterOrder',20,'CutoffFrequency',...
-                cutf,'DesignMethod','window','Window',{@kaiser,3},'SampleRate',sampf);
-        elseif strcmp(theFilter,'BPF')
-            filter_name = designfilt('bandpassfir','FilterOrder',20,'CutoffFrequency1',...
-                cutf(1),'CutoffFrequency2',cutf(2), ...
-                'DesignMethod','window','Window',{@kaiser,3},'SampleRate',sampf);
-        elseif strcmp(theFilter,'BSF')
-            filter_name = designfilt('bandstopfir','FilterOrder',20,'CutoffFrequency1',...
-                cutf(1),'CutoffFrequency2',cutf(2), ...
-                'DesignMethod','window','Window',{@kaiser,3},'SampleRate',sampf);
-        else
-            error('the specified filter is invalid. Exiting...')
-        end
-    case 'IIR'
-        if  strcmp(theFilter,'LPF')
-            filter_name = designfilt('lowpassiir','FilterOrder',iir_order,...
-                'PassbandFrequency',cutf,'PassbandRipple',0.2,...
-                'SampleRate',sampf);
-        elseif strcmp(theFilter,'HPF')
-            filter_name = designfilt('highpassiir','FilterOrder',iir_order,...
-                'PassbandFrequency',35e3,'PassbandRipple',0.2,...
-                'SampleRate',sampf);
-        elseif strcmp(theFilter,'BPF')
-            filter_name = designfilt('bandpassiir','FilterOrder',iir_order, ...
-                'HalfPowerFrequency1',cutf(1),'HalfPowerFrequency2',cutf(2),...
-                'SampleRate',sampf);
-        elseif strcmp(theFilter,'BSF')
-            filter_name = designfilt('bandstopiir','FilterOrder',iir_order, ...
-                'HalfPowerFrequency1',cutf(1),'HalfPowerFrequency2',cutf(2),...
-                'SampleRate',sampf);
-        else
-            error('the specified filter is invalid. Exiting...')
-        end
-    otherwise
-        error('ya got lost somewhere along the highway, kid')
-end
-end
 
