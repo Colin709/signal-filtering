@@ -1,5 +1,4 @@
-function [got_signal,IIR_FIR,design, ...
-    get_filter,cutoff_frequency,the_order,the_ripple] = userinput()
+function [got_signal,Filter] = userinput()
 %function to take user input for signal file and filter type
 %consider breaking this into separate functions for input and load
 
@@ -21,8 +20,7 @@ if strcmp(get_signal,'dir')
     end
 end
 if strcmp(get_signal,'')
-    load('LastSetup.mat','got_signal','IIR_FIR','get_filter', ...
-        'cutoff_frequency','the_order','the_ripple')
+    load('LastSetup.mat','got_signal','Filter')
     return
 end
 got_signal = load([get_signal,'.txt']);
@@ -30,47 +28,43 @@ got_signal = load([get_signal,'.txt']);
 %prompt user to specify FIR or IIR Filter
 prompt = ['\nWould you like to use a FIR or IIR filter? ' ...
     '\na kaiser window filter will be used if choosing FIR\n\n '];
-IIR_FIR = input(prompt,'s');
-if ~strcmp(IIR_FIR,'FIR') && ~strcmp(IIR_FIR,'IIR')
-    error('Error: ya gotta specify FIR or IIR')
-end
-if strcmp(IIR_FIR,'IIR') 
-    prompt = '\n\Which IIR filter design method?: ';
-    design = input(prompt,'s');
-else 
-    design = [];
-end 
+Filter.IIR_FIR = input(prompt,'s');
+
+%prompt user to specify design method
+prompt = ['\nWhich IIR filter design method? ' ...
+    '\n\nNOTES:' ...
+    '\n-this feature is not implemented yet. just press enter' ...
+    '\n-a kaiser window filter will be used if FIR was chosen\' ...
+    '\n-if IIR was chosen..' ...
+    '\n-Choosing LPF or HPF in the next step will default to chebyshev1' ...
+    '\n-Choosing BFP or BSF in the next step will default to butterworth\n\n'];
+Filter.design_method = input(prompt,'s');
 
 %prompt user for filter type
-prompt = '\nWhich filter would you like to use?(LPF,HPF,BPF,BSF): ';
-get_filter = input(prompt,'s');
+prompt = '\nWhich filter response would you like to use?(LPF,HPF,BPF,BSF): ';
+Filter.response = input(prompt,'s');
 
 %prompt user for cutoff frequency/frequencies
-if strcmp(get_filter,'LPF') || strcmp(get_filter,'HPF')
+if strcmp(Filter.response,'LPF') || strcmp(Filter.response,'HPF')
     prompt = '\nWhat is the cutoff frequency?: ';
-    cutoff_frequency = input(prompt);
-elseif strcmp(get_filter,'BPF') || strcmp(get_filter,'BSF')
+    Filter.cutoff_frequency = input(prompt);
+elseif strcmp(Filter.response,'BPF') || strcmp(Filter.response,'BSF')
     prompt = '\nWhat is the lower cutoff frequency?: ';
-    cutoff_frequency(1) = input(prompt);
+    Filter.cutoff_frequency(1) = input(prompt);
     prompt = '\nWhat is the upper cutoff frequency?: ';
-    cutoff_frequency(2) = input(prompt);
+    Filter.cutoff_frequency(2) = input(prompt);
 else
-    error('Error: not a valid filter')
+    error('Error: not a valid filter frequency response')
 end
 
 %prompt user to specify order
 prompt = '\nWhat is the order of the filter?: ';
-the_order = input(prompt);
+Filter.the_order = input(prompt);
 
-%specify a ripple only if IIR
-if strcmp(IIR_FIR,'IIR')
-    prompt = '\nWhat is the ripple of the filter?: ';
-    the_ripple = input(prompt);
-else 
-    the_ripple = [];
-end 
+%prompt user to specify a ripple only if IIR
+prompt = '\nWhat is the ripple of the filter?: ';
+Filter.the_ripple = input(prompt);
 
 %save local variables for future use
-save('LastSetup.mat','got_signal','IIR_FIR','get_filter', ...
-    'cutoff_frequency','the_order','the_ripple')
+save('LastSetup.mat','got_signal','Filter')
 end

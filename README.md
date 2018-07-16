@@ -10,5 +10,5 @@ What is plotted:
   - overlay of filtered signal on original signal
 
 To be implemented:
-  - butterworth and chebyshev filtering
+  - specified design methods rather than defaults
   - better scaling of output plots
