@@ -16,20 +16,22 @@ classdef filter_class
     
     methods (Static)
         
-        function designed_filter = filterDesign(filter_s,samplingf)
+        function designed_filter = filterDesign(filter_s,samplingf,argument_s)
             % DESIGNED_FILTER - design either FIR or IIR filter
             
             if strcmp(filter_s.IIR_FIR,'FIR')
-                designed_filter = filter_class.FIR_filterDesign(filter_s,samplingf);
+                designed_filter = ...
+                    filter_class.FIR_filterDesign(filter_s,samplingf,argument_s);
             elseif strcmp(filter_s.IIR_FIR,'IIR')
-                designed_filter = filter_class.IIR_filterDesign(filter_s,samplingf);
+                designed_filter = ...
+                    filter_class.IIR_filterDesign(filter_s,samplingf,argument_s);
             else
                 error('Not a valid filter design. Specify FIR or IIR')
             end
         end
         
         
-        function FIR_filter = FIR_filterDesign(filter_in,sampf)
+        function FIR_filter = FIR_filterDesign(filter_in,sampf,argument_in)
             %FIR_FILTERDESIGN - creates FIR filter
             
             if  strcmp(filter_in.response,'LPF')
@@ -63,7 +65,7 @@ classdef filter_class
             end
         end
         
-        function IIR_filter = IIR_filterDesign(filter_in,sampf)
+        function IIR_filter = IIR_filterDesign(filter_in,sampf,argument_in)
             %IIR_FILTERDESIGN - creates IIR filter
             
             if  strcmp(filter_in.response,'LPF')
@@ -90,8 +92,6 @@ classdef filter_class
                     'HalfPowerFrequency1',filter_in.cutoff_frequency(1),...
                     'HalfPowerFrequency2',filter_in.cutoff_frequency(2),...
                     'SampleRate',sampf);
-                %need to implement design method
-                %'DesignMethod',design_method);
             else
                 error('the specified filter is invalid.')
             end

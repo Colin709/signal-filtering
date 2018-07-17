@@ -1,4 +1,4 @@
-function [got_signal,Filter] = userinput()
+function [got_signal,Filter,design_arguments] = userinput()
 %function to take user input for signal file and filter type
 %consider breaking this into separate functions for input and load
 
@@ -20,29 +20,24 @@ if strcmp(get_signal,'dir')
     end
 end
 if strcmp(get_signal,'')
-    load('LastSetup.mat','got_signal','Filter')
+    load('LastSetup.mat','got_signal','Filter','design_arguments')
     return
 end
 got_signal = load([get_signal,'.txt']);
 
 %prompt user to specify FIR or IIR Filter
-prompt = ['\nWould you like to use a FIR or IIR filter? ' ...
-    '\na kaiser window filter will be used if choosing FIR\n\n '];
+prompt = '\nWould you like to use a FIR or IIR filter? ';
 Filter.IIR_FIR = input(prompt,'s');
 
-%prompt user to specify design method
-prompt = ['\nWhich IIR filter design method? ' ...
-    '\n\nNOTES:' ...
-    '\n-this feature is not implemented yet. just press enter' ...
-    '\n-a kaiser window filter will be used if FIR was chosen\' ...
-    '\n-if IIR was chosen..' ...
-    '\n-Choosing LPF or HPF in the next step will default to chebyshev1' ...
-    '\n-Choosing BFP or BSF in the next step will default to butterworth\n\n'];
-Filter.design_method = input(prompt,'s');
+%prompt user to specify which design method
+Filter.design_method = input_designMethod(Filter.IIR_FIR);
 
 %prompt user for filter type
-prompt = '\nWhich filter response would you like to use?(LPF,HPF,BPF,BSF): ';
+prompt = ['\nWhich filter response would you like to use?'...
+    '(LPF,HPF,BPF,BSF): '];
 Filter.response = input(prompt,'s');
+
+design_arguments = design_argumentNames(Filter);
 
 %prompt user for cutoff frequency/frequencies
 if strcmp(Filter.response,'LPF') || strcmp(Filter.response,'HPF')
@@ -66,5 +61,7 @@ prompt = '\nWhat is the ripple of the filter?: ';
 Filter.the_ripple = input(prompt);
 
 %save local variables for future use
-save('LastSetup.mat','got_signal','Filter')
+save('LastSetup.mat','got_signal','Filter','design_arguments')
 end
+
+
