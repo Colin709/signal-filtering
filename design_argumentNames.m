@@ -4,8 +4,8 @@ if strcmp(filter_argument.IIR_FIR,'IIR') && strcmp(filter_argument.response,'LPF
     switch filter_argument.design_method
         case 'butter'
             prompt = ['\nWhich design argument Name-Value pairs would you like to use?'...
-                '\n1.'...
-                '\n2.\n\n'];
+                '\n1.Frequency Constraint - PassbandFrequency and StopbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation. Design Option - Match Exactly'...
+                '\n2.Filter Order - FilterOrder. Frequency Constraint - HalfPowerFrequency.\n\n'];
             argSelection_lpiir = input(prompt);
             if argSelection_lpiir == 1
                 filter_argumentNames = '';
@@ -16,8 +16,8 @@ if strcmp(filter_argument.IIR_FIR,'IIR') && strcmp(filter_argument.response,'LPF
             end
         case 'cheby1'
             prompt = ['\nWhich design argument Name-Value pairs would you like to use?'...
-                '\n1.'...
-                '\n2.\n\n'];
+                '\n1.Frequency Constraint - PassbandFrequency and StopbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation. Design Option - Match Exactly'... '...
+                '\n2.Filter Order - FilterOrder. Frequency Constraint - PassbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation\n\n'];
             argSelection_lpiir = input(prompt);
             if argSelection_lpiir == 1
                 filter_argumentNames = '';
@@ -28,8 +28,8 @@ if strcmp(filter_argument.IIR_FIR,'IIR') && strcmp(filter_argument.response,'LPF
             end
         case 'cheby2'
             prompt = ['\nWhich design argument Name-Value pairs would you like to use?'...
-                '\n1.'...
-                '\n2.\n\n'];
+                '\n1.Frequency Constraint - PassbandFrequency and StopbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation. Design Option - Match Exactly'...
+                '\n2.Filter Order - FilterOrder. Frequency Constaint - StopbandFrequency. Magnitude Constaint - StopbandAttenuation.\n\n'];
             argSelection_lpiir = input(prompt);
             if argSelection_lpiir == 1
                 filter_argumentNames = '';
@@ -40,8 +40,8 @@ if strcmp(filter_argument.IIR_FIR,'IIR') && strcmp(filter_argument.response,'LPF
             end
         case 'ellip'
             prompt = ['\nWhich design argument Name-Value pairs would you like to use?'...
-                '\n1.'...
-                '\n2.\n\n'];
+                '\n1.Frequency Constraint - PassbandFrequency and StopbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation. Design Option - Match Exactly'...
+                '\n2.Filter Order - FilterOrder. Frequency Constaint - PassbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation.\n\n'];
             argSelection_lpiir = input(prompt);
             if argSelection_lpiir == 1
                 filter_argumentNames = '';
@@ -55,7 +55,7 @@ elseif strcmp(filter_argument.IIR_FIR,'IIR') && strcmp(filter_argument.response,
     switch filter_argument.design_method
         case 'butter'
             prompt = ['\nWhich design argument Name-Value pairs would you like to use?'...
-                '\n1.'...
+                '\n1.Frequency Constraint - PassbandFrequency and StopbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation. Design Option - Match Exactly'...
                 '\n2.\n\n'];
             argSelection_hpiir = input(prompt);
             if argSelection_hpiir == 1
@@ -67,7 +67,7 @@ elseif strcmp(filter_argument.IIR_FIR,'IIR') && strcmp(filter_argument.response,
             end
         case 'cheby1'
             prompt = ['\nWhich design argument Name-Value pairs would you like to use?'...
-                '\n1.'...
+                '\n1.Frequency Constraint - PassbandFrequency and StopbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation. Design Option - Match Exactly'...
                 '\n2.\n\n'];
             argSelection_hpiir = input(prompt);
             if argSelection_hpiir == 1
@@ -79,7 +79,7 @@ elseif strcmp(filter_argument.IIR_FIR,'IIR') && strcmp(filter_argument.response,
             end
         case 'cheby2'
             prompt = ['\nWhich design argument Name-Value pairs would you like to use?'...
-                '\n1.'...
+                '\n1.Frequency Constraint - PassbandFrequency and StopbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation. Design Option - Match Exactly'...
                 '\n2.\n\n'];
             argSelection_hpiir = input(prompt);
             if argSelection_hpiir == 1
@@ -91,7 +91,7 @@ elseif strcmp(filter_argument.IIR_FIR,'IIR') && strcmp(filter_argument.response,
             end
         case 'ellip'
             prompt = ['\nWhich design argument Name-Value pairs would you like to use?'...
-                '\n1.'...
+                '\n1.Frequency Constraint - PassbandFrequency and StopbandFrequency. Magnitude Constraint - PassbandRipple and StopbandAttenuation. Design Option - Match Exactly'...
                 '\n2.\n\n'];
             argSelection_hpiir = input(prompt);
             if argSelection_hpiir == 1
