@@ -192,29 +192,162 @@ classdef input_class
         function [CustomFilter] = CustomFilter_input(filter_cust)
             %CUSTOMFILER_INPUT - input if not min order
             
-            CustomFilter = filter_cust;
-            % %prompt user for cutoff frequency/frequencies
-            %             if strcmp(Filter.response,'LPF') || strcmp(Filter.response,'HPF')
-            %                 prompt = '\nWhat is the cutoff frequency?: ';
-            %                 Filter.cutoff_frequency = input(prompt);
-            %             elseif strcmp(Filter.response,'BPF') || strcmp(Filter.response,'BSF')
-            %                 prompt = '\nWhat is the lower cutoff frequency?: ';
-            %                 Filter.cutoff_frequency(1) = input(prompt);
-            %                 prompt = '\nWhat is the upper cutoff frequency?: ';
-            %                 Filter.cutoff_frequency(2) = input(prompt);
-            %             else
-            %                 error('Error: not a valid filter frequency response')
-            %             end
-            %
-            %             %prompt user to specify order
-            %             prompt = '\nWhat is the order of the filter?: ';
-            %             Filter.the_order = input(prompt);
-            %
-            %             %prompt user to specify a ripple
-            %             prompt = '\nWhat is the ripple of the filter?: ';
-            %             Filter.the_ripple = input(prompt);
+            %prompt user to specify order
+            prompt = '\nWhat is the order of the filter?: ';
+            CustomFilter.FilterOrder = input(prompt);
             
+            switch filter_cust.iir_fir
+                
+                case strcmp(filter_cust.iir_fir,'iir')
+                    
+                    if strcmp(filter_cust.DesignMethod,'butter')
+                        prompt = ...
+                            '\nWhat is the Half Power Frequency?: ';
+                        CustomFilter.HalfPowerFrequency = input(prompt);
+                        
+                        if strcmp(filter_cust.FrequencyResponse,'bandpass') || ...
+                                strcmp(filter_cust.FrequencyResponse,'bandstop')
+                            prompt = ...
+                                '\nWhat is the Half Power Frequency 2?: ';
+                            CustomFilter.HalfPowerFrequency2 = input(prompt);
+                        end
+                        
+                    elseif strcmp(filter_cust.DesignMethod,'cheby1')
+                        prompt = ...
+                            '\nWhat is the Passband Frequency?: ';
+                        CustomFilter.PassbandFrequency = input(prompt);
+                        prompt = ...
+                            '\nWhat is the Passband Ripple?: ';
+                        CustomFilter.PassbandRipple = input(prompt);
+                        
+                        if strcmp(filter_cust.FrequencyResponse,'bandpass')...
+                                || strcmp(filter_cust.FrequencyResponse,'bandstop')
+                            prompt = ...
+                                '\nWhat is the Passband Frequency 2?: ';
+                            CustomFilter.PassbandFrequency2 = input(prompt);
+                        end
+                        
+                    elseif strcmp(filter_cust.DesignMethod,'cheby2')
+                        prompt = ...
+                            '\nWhat is the Stopband Frequency?: ';
+                        CustomFilter.StopbandFrequency = input(prompt);
+                        prompt = ...
+                            '\nWhat is the Stopband Attenuation?: ';
+                        CustomFilter.StopbandAttenuation = input(prompt);
+                        
+                        if strcmp(filter_cust.FrequencyResponse,'bandpass') || ...
+                                strcmp(filter_cust.FrequencyResponse,'bandstop')
+                            prompt = ...
+                                '\nWhat is the Stopband Frequency 2?: ';
+                            CustomFilter.StopbandFrequency2 = input(prompt);
+                        end
+                        
+                    elseif strcmp(filter_cust.DesignMethod,'ellip')
+                        prompt = ...
+                            '\nWhat is the Passband Frequency?: ';
+                        CustomFilter.PassbandFrequency = input(prompt);
+                        prompt = ...
+                            '\nWhat is the Passband Ripple?: ';
+                        CustomFilter.PassbandRipple = input(prompt);
+                        prompt = ...
+                            '\nWhat is the Stopband Attenuation?: ';
+                        CustomFilter.StopbandAttenuation = input(prompt);
+                        
+                        if strcmp(filter_cust.FrequencyResponse,'bandpass') || ...
+                                strcmp(filter_cust.FrequencyResponse,'bandstop')
+                            prompt = ...
+                                '\nWhat is the Passband Frequency 2?: ';
+                            CustomFilter.PassbandFrequency2 = input(prompt);
+                            
+                            if strcmp(filter_cust.FrequencyResponse,'bandpass')
+                                prompt = ...
+                                    '\nWhat is the Stopband Attenuation 2?: ';
+                                CustomFilter.StopbandAttenuation2 = input(prompt);
+                            end
+                        end
+                    end
+                    
+                case strcmp(filter_cust.iir_fir,'iir')
+                    
+                    if strcmp(filter_cust.DesignMethod,'window')
+                        prompt = ...
+                            '\nWhat is the Cutoff Frequency?: ';
+                        CustomFilter.CutoffFrequency = input(prompt);
+                        
+                        if strcmp(filter_cust.FrequencyResponse,'bandpass') || ...
+                                strcmp(filter_cust.FrequencyResponse,'bandstop')
+                            prompt = ...
+                                '\nWhat is the Cutoff Frequency 2?: ';
+                            CustomFilter.CutoffFrequency2 = input(prompt);
+                        end
+                        
+                    elseif strcmp(filter_cust.DesignMethod,'cls')
+                        prompt = ...
+                            '\nWhat is the Cutoff Frequency?: ';
+                        CustomFilter.CutoffFrequency = input(prompt);
+                        prompt = ...
+                            '\nWhat is the Passband Ripple?: ';
+                        CustomFilter.PassbandRipple = input(prompt);
+                        prompt = ...
+                            '\nWhat is the Stopband Attenuation?: ';
+                        CustomFilter.StopbandAttenuation = input(prompt);
+                        
+                        if strcmp(filter_cust.FrequencyResponse,'bandpass')...
+                                || strcmp(filter_cust.FrequencyResponse,'bandstop')
+                            prompt = ...
+                                '\nWhat is the Cutoff Frequency 2?: ';
+                            CustomFilter.CutoffFrequency2 = input(prompt);
+                            if strcmp(filter_cust.FrequencyResponse,'bandpass')
+                                prompt = ...
+                                    '\nWhat is the Stopband Attenuation2?: ';
+                                CustomFilter.StopbandAttenuation2 = input(prompt);
+                            elseif strcmp(filter_cust.FrequencyResponse,'bandstop')
+                                prompt = ...
+                                    '\nWhat is the Passband Ripple2?: ';
+                                CustomFilter.PassbandRipple2 = input(prompt);
+                            end
+                        end
+                        
+                    elseif strcmp(filter_cust.DesignMethod,'equiripple')
+                        prompt = ...
+                            '\nWhat is the Passband Frequency?: ';
+                        CustomFilter.PassbandFrequency = input(prompt);
+                        prompt = ...
+                            '\nWhat is the Stopband Frequency?: ';
+                        CustomFilter.StopbandFrequency = input(prompt);
+                        
+                        if strcmp(filter_cust.FrequencyResponse,'bandpass') || ...
+                                strcmp(filter_cust.FrequencyResponse,'bandstop')
+                            prompt = ...
+                                '\nWhat is the Passband Frequency?: ';
+                            CustomFilter.PassbandFrequency = input(prompt);
+                            prompt = ...
+                                '\nWhat is the Stopband Frequency 2?: ';
+                            CustomFilter.StopbandFrequency2 = input(prompt);
+                        end
+                        
+                    elseif strcmp(filter_cust.DesignMethod,'ls')
+                        prompt = ...
+                            '\nWhat is the Passband Frequency?: ';
+                        CustomFilter.PassbandFrequency = input(prompt);
+                        prompt = ...
+                            '\nWhat is the Stopband Frequency?: ';
+                        CustomFilter.StopbandFrequency = input(prompt);
+                        if strcmp(filter_cust.FrequencyResponse,'bandpass') || ...
+                                strcmp(filter_cust.FrequencyResponse,'bandstop')
+                            prompt = ...
+                                '\nWhat is the Passband Frequency?: ';
+                            CustomFilter.PassbandFrequency = input(prompt);
+                            prompt = ...
+                                '\nWhat is the Stopband Frequency 2?: ';
+                            CustomFilter.StopbandFrequency2 = input(prompt);
+                        end
+                    end
+                otherwise
+                    error('something went wrong with custom filter')
+            end
         end
     end
 end
+
 

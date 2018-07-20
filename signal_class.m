@@ -15,6 +15,8 @@ classdef signal_class
     properties
         time
         voltage
+        %         startTime
+        %         endTime
         Nrows
         Ncolumns
         sampling_f
@@ -22,6 +24,7 @@ classdef signal_class
         estimated_f
         sampled_f
         PSD
+        downSamples
     end
     
     methods (Static)
@@ -30,18 +33,24 @@ classdef signal_class
             %SIGNAL_CLASS Construct an instance of this class
             
             % Access the time and voltage in columns 1 and 2
-            time_ = given_signal(: , 1);
-            voltage_ = given_signal(: , 2);
+            obj.time = given_signal(: , 1);
+            obj.voltage = given_signal(: , 2)*1000;
             
             % Retrieve number of rows and columns
             [obj.Nrows,obj.Ncolumns] = size(given_signal);
             
             % Adjust time to start at 0 and v to be in mV
-            obj.time = time_ - time_(1);
-            obj.voltage = voltage_*1000;
+            % commented section are optional adjustments
+            %             cnt=1;
+            %             while abs(obj.voltage(cnt)) < 10
+            %                 cnt=cnt+1;
+            %             end
+            %             obj.startTime = obj.time(cnt);
+            %             obj.endTime = obj.time(end);
+            %             obj.time = time_ - time(1);
             
             % Get the sampling parameters of the signal
-            [obj.sampling_f,obj.nyquist_f] = ...
+            [obj.sampling_f,obj.nyquist_f,obj.downSamples] = ...
                 signal_class.sample_rate(obj.time,obj.Nrows);
             
             % Get the PSD of the signal
@@ -50,7 +59,7 @@ classdef signal_class
             
         end
         
-        function [sample_frequency,nyquist_frequency] = ...
+        function [sample_frequency,nyquist_frequency,dSample_factor] = ...
                 sample_rate(sampleTime,sampleRows)
             %function to get sample rate (as frequency) and nyquist freq
             
@@ -58,6 +67,18 @@ classdef signal_class
             Tsamp = max(sampleTime)/Nsamps;
             sample_frequency = 1/Tsamp;
             nyquist_frequency = sample_frequency/2;
+            
+            %get three downsampling factors
+            %dSample_factor=zeros();
+            time2sample=sampleTime;
+            dSample_factor{1,3} = zeros(1,3);
+            i=1;
+            for fact = 1:3
+                dSample_factor{fact} = downsample(time2sample,2);
+                time2sample = dSample_factor{fact};
+                fact=fact+1;
+            end
+            
         end
         
         function [Pxx,f,signalf_estimate] = ...
@@ -71,6 +92,7 @@ classdef signal_class
             % Get frequency estimate (spectral peak)
             [~,loc] = max(Pxx);
             signalf_estimate = f(loc);
+            
         end
     end
 end

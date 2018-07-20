@@ -15,6 +15,10 @@ close all; clear; clc;
 mySignal = signal_class(input_signal);
 clear input_signal
 
+%audio = audioplayer([mySignal.time,mySignal.voltage],mySignal.sampling_f*2);
+%play(audio)
+
+
 %design the filter based on structure created from user input
 myFilter = filter_class.filterDesign(filter_params,mySignal.sampling_f);
 clear filter_params
@@ -39,7 +43,7 @@ response = fvtool(myFilter,'FS',mySignal.sampling_f);
 %apply filter and plot
 filtered_signal = filter(myFilter,mySignal.voltage);
 plot(mySignal.time,mySignal.voltage,mySignal.time,filtered_signal)
-xlim([0 1])
+xlim([mySignal.time(1) mySignal.time(end)])
 xlabel('Time (s)')
 ylabel('Amplitude (mV)')
 legend('Original Signal','Filtered Data')
