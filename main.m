@@ -92,7 +92,7 @@ for i = 1:4
     xlabel('Time (seconds)'); ylabel('Voltage (mV)')
     xlim([0,0.25])
 end
-clear i; clear time2sample;
+clear i; clear signal2sample;
 
 % SAMPLING(my_signal) is a function to calculate sampling parameters
 function [num_samples,sample_array,voltage_array,sample_rate] ...
