@@ -52,7 +52,7 @@ sample_rate = num_samples/max_sample;
 end
 
 function downSample_twos(signal2sample)
-% downsample by a factor of two, four times, and subplot.
+% downsample by a factor of two, four times, ad subplot.
 % performing downsampling on downsampled signals
 
 for i = 1:4
