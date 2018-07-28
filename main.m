@@ -12,6 +12,7 @@ signal = load('Em25ms10kSs.txt');
 [PSD,freq,estimated_f,FastFT] = frequency(Nsamples,voltages,rate);
 
 % plot the original signal
+figure(1)
 subplot(3,1,1)
 grid on
 plot (samples,voltages)
@@ -20,34 +21,30 @@ xlabel('Time (seconds)'); ylabel('Voltage (mV)')
 title('Voltage vs time')
 
 % plot the Power of the frequencies from fft function
+figure(1)
 subplot(3,1,2)
 plot(FastFT.f,FastFT.P(1:FastFT.n/2+1))
 title('FFT of signal')
 xlabel('Frequency (Hz)'); ylabel('|P(f)|')
 
 % plot the PSD using pwelch
+figure(1)
 subplot(3,1,3)
 plot(freq,PSD)
 title(['estimated frequency: ',num2str(estimated_f),' hz'])
 xlabel('Frequency (Hz)'); ylabel('PSD')
-
+hold off
+    
 %design the filters (low-pass, high-pass, band-pass, band-stop)
-myFilters = design_filters(rate);
-filt{1} = myFilters.lp;
-filt{2} = myFilters.hp;
-filt{3} = myFilters.bp;
-filt{4} = myFilters.bs;
+%
+Filter = design_filters(rate);
 
 % loop to plot filter related things
 response(1,1:4) = {[]};
 for k = 1:4
-    
-    % Magnitude Frequency response of each filter
-    response{k}=fvtool(filt{k});
-    
     % filter the original signal with each filter
-    filtered_signal = filter(filt{k},voltages);
-    delay = mean(grpdelay(filt{k}));
+    filtered_signal = filter(Filter{k},voltages);
+    delay = mean(grpdelay(Filter{k}));
     samplesAdj = samples(1:end-delay);
     voltagesAdj = voltages(1:end-delay);
     filtered_signalAdj = filtered_signal;
@@ -57,7 +54,7 @@ for k = 1:4
     % NOTE THAT THIS IS ADJUSTED FOR PHASE DELAY. 
     % DEPENDING ON SIGNAL, MAY THROW A WARNING 
     % ADJUST THE FILTER PASSBAND/STOPBAND VALUES
-    figure(69)
+    figure(2)
     subplot(2,2,k)
     plot(samplesAdj,voltagesAdj)
     hold on, plot(samplesAdj,filtered_signalAdj,'-r','linewidth',1.5), hold off
@@ -65,6 +62,9 @@ for k = 1:4
     xlabel('Time (s)')
     ylabel('Amplitude (mV)')
     legend('Original Signal','Filtered Data')
+    
+    % Magnitude Frequency response of each filter in figures 3 - 6
+    response{k}=fvtool(Filter{k});
 end
 
 % downsample and plot
@@ -83,7 +83,7 @@ for i = 1:4
     MAX_SAMPS = max(TIME);
     SAMPY_RATE = Ntime/MAX_SAMPS;
     
-    figure(420)
+    figure(7)
     subplot(2,2,i)
     grid on
     plot(TIME,VOLT)
@@ -92,6 +92,7 @@ for i = 1:4
     xlabel('Time (seconds)'); ylabel('Voltage (mV)')
     xlim([0,0.25])
 end
+hold off
 clear i; clear signal2sample;
 
 % SAMPLING(my_signal) is a function to calculate sampling parameters
@@ -130,27 +131,27 @@ end
 
 % design_filters(samp_rate) creates four minimum order FIR filters based
 % on the sampling rate of the original signal
-function [Filters] = design_filters(samp_rate)
+function [filt] = design_filters(samp_rate)
 
 %low-pass IIR min-order filter
-Filters.lp = designfilt('lowpassfir', ...
+filt{1} = designfilt('lowpassfir', ...
     'PassbandFrequency',650,'StopbandFrequency',700,...
     'StopbandAttenuation',80,'PassbandRipple',1,...
     'DesignMethod','equiripple','SampleRate',samp_rate);
 
-Filters.hp = designfilt('highpassfir',...
+filt{2} = designfilt('highpassfir',...
     'PassbandFrequency',85,'StopbandFrequency',70,...
     'StopbandAttenuation',80,'PassbandRipple',1,...
     'DesignMethod','equiripple','SampleRate',samp_rate);
 
-Filters.bp = designfilt('bandpassfir', ...
+filt{3} = designfilt('bandpassfir', ...
     'StopbandFrequency1',70,'PassbandFrequency1',85,...
     'PassbandFrequency2',650,'StopbandFrequency2',700,...
     'StopbandAttenuation1',80,'PassbandRipple',1,...
     'StopbandAttenuation2',80,'DesignMethod','equiripple',...
     'SampleRate',samp_rate);
 
-Filters.bs = designfilt('bandstopfir', ...
+filt{4} = designfilt('bandstopfir', ...
     'StopbandFrequency1',250,'PassbandFrequency1',230,...
     'PassbandFrequency2',350,'StopbandFrequency2',330,...
     'StopbandAttenuation',80,'PassbandRipple1',1,...

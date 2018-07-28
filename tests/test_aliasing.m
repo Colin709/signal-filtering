@@ -68,8 +68,7 @@ for i = 1:4
     subplot(2,2,i)
     grid on
     plot(dsTime,signal2sample(:,2))
-    title(['Downsampled Waveform. Sample Rate = ',...
-        num2str(round(dsRate)),' hZ'])
+    title(['Downsampled Sample Rate = ',num2str(round(dsRate)),' hZ'])
     xlabel('Time (seconds)'); ylabel('Voltage (mV)')
     xlim([0,max(dsTime)])
 end
@@ -89,12 +88,10 @@ for j = 1:4
     
     % plot the downsampled signals in a 2x2 figure
     figure(3)
-    title('Downsampled Waveforms')
     subplot(2,2,j)
     grid on
     plot(DsTime,sampleThis(:,2))
-    title(['Sample Rate = ',...
-        num2str(round(DsRate)),' hZ'])
+    title(['Downsampled Sample Rate = ',num2str(round(DsRate)),' hZ'])
     xlabel('Time (seconds)'); ylabel('Voltage (mV)')
     xlim([0,max(DsTime)])
 end
