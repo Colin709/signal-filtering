@@ -39,7 +39,8 @@ classdef Signal
             
             % Parameters for Plotting Pwelchs PSD
             Nfft = 2^(floor(log(N_samples)/log(2)));
-            [Welch.PSD,Welch.f] = pwelch(Values,gausswin(Nfft),Nfft/2,Nfft,sample_rate);
+            [Welch.PSD,Welch.f] = ...
+                pwelch(Values,gausswin(Nfft),Nfft/2,Nfft,sample_rate);
             [~,loc] = max(Welch.PSD);
             Welch.f_est = Welch.f(loc);
         end

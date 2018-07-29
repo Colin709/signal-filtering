@@ -11,10 +11,10 @@ classdef Filters
     
     methods(Static)
         
-        % design_filters() creates a structure that contains four minimum order
-        %   FIR filters based on the sampling rate of the original signal
-        % frequency band values are hard coded and tuned values depend on the
-        %   signal and application
+        % design_filters() creates a structure that contains four minimum
+        %   order FIR filters based on the sampling rate of the original
+        %   signal frequency band values are hard coded and tuned values
+        %   depend on the signal and application
         function obj = Filters(samp_rate)
             
             % low-pass FIR min-order filter
@@ -47,6 +47,5 @@ classdef Filters
         end
         
     end
-    
 end
 

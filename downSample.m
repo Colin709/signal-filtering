@@ -6,73 +6,24 @@ classdef downSample
     % Takes a signal and number of iterations as arguments
     
     properties
-        downSampled_signal
+        signal
+        samples
+        Nsamples
+        values
+        FS
     end
     
-    methods (Static)
+    methods(Static)
         
-        function obj = downSample(input_signal,NdownSamples,aliasing)
-            if aliasing == false
-                obj.downSampled_signal = ...
-                    downSample.DownSample_ones(input_signal,NdownSamples);
-            elseif aliasing == true
-                obj.downSampled_signal = ...
-                    downSample.DownSample_twos(input_signal,NdownSamples);
-            else 
-                error('please state a valid aliasing option')
-            end 
+        function obj = downSample(inputSignal,Factor)
+            % Construct instance of downSample class
+            
+            obj.signal = downsample(inputSignal,Factor);
+            obj.samples = obj.signal(:,1);
+            [obj.Nsamples,~] = size(obj.samples);
+            obj.values = obj.signal(:,2);
+            obj.FS = (obj.Nsamples/max(obj.samples));
         end
-        
-        function [ds_Signal] = DownSample_ones(Signal2sample,Cnt)
-            % downsampling by consecutive integers
-            % only the original signal is downsampled
-            ds_Signal(1,1:Cnt) = {[]};
-            figure
-            for j = 1:Cnt
-                sampleThis = Signal2sample;
-                sampleThis = downsample(sampleThis,j+1);
-                ds_Signal{j} = sampleThis;
-                
-                % get sample rate (frequency)
-                DsTime = sampleThis(:,1);
-                [nTime,~] = size(DsTime);
-                DsRate = (nTime/max(DsTime));
-                
-                % plot the downsampled signals in a 2x2 figure
-                subplot(2,2,j)
-                grid on
-                plot(DsTime,sampleThis(:,2))
-                title(['Downsampled Sample Rate = ',...
-                    num2str(round(DsRate)),' hZ'])
-                xlabel('Time (seconds)'); ylabel('Voltage (mV)')
-                xlim([0,max(DsTime)])
-            end
-        end
-        
-        function [ds_signal] = DownSample_twos(signal2sample,cnt)
-            % downsample by a factor of two, four times
-            % performing downsampling on downsampled signals
-            ds_signal(1,1:cnt) = {[]};
-            figure
-            for i = 1:cnt
-                signal2sample = downsample(signal2sample,2);
-                ds_signal{i} = signal2sample;
-                % get sample rate (frequency)
-                dsTime = signal2sample(:,1);
-                [Ntime,~] = size(dsTime);
-                dsRate = Ntime/max(dsTime);
-                
-                % plot the downsampled signals in a 2x2 figure
-                subplot(2,2,i)
-                grid on
-                plot(dsTime,signal2sample(:,2))
-                title(['Downsampled Sample Rate = ',...
-                    num2str(round(dsRate)),' hZ'])
-                xlabel('Time (seconds)'); ylabel('Voltage (mV)')
-                xlim([0,max(dsTime)])
-            end
-        end
-        
     end
 end
 
