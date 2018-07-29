@@ -19,7 +19,7 @@ plot(signal.samples,signal.values)
 title('Original Signal Waveform')
 xlabel('Time (seconds)'); ylabel('Voltage (mV)')
 
-% plot the Power of the frequencies from n-point fft function 
+% plot the Power of the frequencies from n-point fft function
 subplot(3,1,2)
 plot(signal.FFT.f,signal.FFT.P(1:signal.FFT.n/2+1))
 title('FFT of signal')
@@ -32,21 +32,55 @@ title(['estimated frequency: ',num2str(signal.Welch.f_est),' hz'])
 xlabel('Frequency (Hz)'); ylabel('PSD')
 pause(1)
 
+NdownSamples = 4;
+% create an instance of downsampled signal without aliasing
+aliasing = false;
+correct_downSampling = downSample(input_signal,NdownSamples,aliasing);
+
+% create an instance of downsampled signal with aliasing
+aliasing = true;
+aliased_downSampling = downSample(input_signal,NdownSamples,aliasing);
+
 % design the filters (low-pass, high-pass, band-pass, band-stop)
-Filt = Filter.design_filters(signal.FS);
-[~,Nfilters] = size(Filt);
+myFilters = Filters(signal.FS);
+[Nfilters,~] = size(properties(myFilters));
+filt{1} = myFilters.LPF;
+filt{2} = myFilters.HPF;
+filt{3} = myFilters.BPF;
+filt{4} = myFilters.BSF;
 
-% plot the filter responses
-[filteredSignal,filteredSignal_adjusted] = ...
-     Filter.plot_filters(Nfilters,Filt,signal.values,signal.samples);
+% apply the filters to the signal
+filtered_signal(1,1:Nfilters) = {[]};
+for k = 1:Nfilters
+    filtered_signal{k} = filter(filt{k},signal.values);
+end
 
-% downsampled signals plotted in function, and returned to main so I can
-%   play with the signals. 
-% downsample the signal by consecutive integers and plot
-downsampled = downSample.DownSample_ones(input_signal,Nfilters);
-% downsample the signal by multiples of 2 and plot
-% introduces aliasing faster than consecutive integers
-downsampled_aliasing = downSample.DownSample_twos(input_signal,Nfilters);
+% adjust the overlay to compensate for phase delay
+Adjustment = adjust(filt,signal,filtered_signal);
+% plot the filter stuff
+figure
+for k = 1:Nfilters
+    subplot(2,2,k); plot(Adjustment.samples{k},Adjustment.values{k});
+    hold on,plot(Adjustment.samples{k},Adjustment.filtered_signal{k},...
+        '-r','linewidth',1.5),hold off
+    xlim([0,0.15])
+    xlabel('Time (s)'); ylabel('Amplitude (mV)')
+    legend('Original Signal','Filtered Data')
+end
+
+response(1,1:Nfilters) = {[]};
+for p = 1:Nfilters
+    % Magnitude Frequency response of each filter in 4 figures
+    response{p}=fvtool(filt{p});
+end
 toc
 
-% plot the downsampled signals
+function [adjusted] = adjust(Filt,signal_,filtered_signal_)
+for z = 1:4
+    delay = mean(grpdelay(Filt{z}));
+    adjusted.samples{z} = signal_.samples(1:end-delay);
+    adjusted.values{z} = signal_.values(1:end-delay);
+    adjusted.filtered_signal{z} = filtered_signal_{z};
+    adjusted.filtered_signal{z}(1:delay) = [];
+end
+end

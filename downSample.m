@@ -6,9 +6,22 @@ classdef downSample
     % Takes a signal and number of iterations as arguments
     
     properties
+        downSampled_signal
     end
     
     methods (Static)
+        
+        function obj = downSample(input_signal,NdownSamples,aliasing)
+            if aliasing == false
+                obj.downSampled_signal = ...
+                    downSample.DownSample_ones(input_signal,NdownSamples);
+            elseif aliasing == true
+                obj.downSampled_signal = ...
+                    downSample.DownSample_twos(input_signal,NdownSamples);
+            else 
+                error('please state a valid aliasing option')
+            end 
+        end
         
         function [ds_Signal] = DownSample_ones(Signal2sample,Cnt)
             % downsampling by consecutive integers
