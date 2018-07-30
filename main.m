@@ -14,7 +14,7 @@ tic
 % Set the envelope 1 if you want peak envelope detection on downsamples,
 %   set to 0 otherwise
 % Peak is used to determine the number of samples between peak detection
-p_envelope = 0;
+p_envelope = 1;
 Peak = 100;
 NdownSamples = 4;
 
@@ -52,6 +52,7 @@ pause(1)
 
 % downsample by 4 factors
 ds_Signal(1,1:NdownSamples) = {[]};
+figure
 for j = 1:NdownSamples
     ds_Signal{j} = downSample(input_signal,j+1);
     
@@ -85,27 +86,30 @@ filt{2} = myFilters.HPF;
 filt{3} = myFilters.BPF;
 filt{4} = myFilters.BSF;
 
-% apply the filters to the signal
+%apply the filters to the signal
 filtered_signal(1,1:Nfilters) = {[]};
 for k = 1:Nfilters
     filtered_signal{k} = filter(filt{k},signal.values);
 end
 
-% adjust the overlay to compensate for phase delay
+%adjust the overlay to compensate for phase delay
 Adjustment = adjust(filt,signal,filtered_signal);
-% plot the filter stuff
+%plot the filter stuff
 figure
 for k = 1:Nfilters
-    subplot(2,2,k); plot(Adjustment.samples{k},Adjustment.values{k}*1000);
+    subplot(2,2,k); 
+    plot(Adjustment.samples{k},Adjustment.values{k}*1000);
     hold on
     plot(Adjustment.samples{k},Adjustment.filtered_signal{k}*1000,...
         '-r','linewidth',1.5),hold off
     xlim([0,0.15])
+    title(['filtered signal with: ',...
+        num2str(filt{k}.FrequencyResponse),' filter'])
     xlabel('Time (s)'); ylabel('Voltage (mV)')
     legend('Original Signal','Filtered Data')
 end
 
-% Magnitude Frequency response of each filter in 4 figures
+%Magnitude Frequency response of each filter in 4 figures
 response(1,1:Nfilters) = {[]};
 for p = 1:Nfilters
     response{p}=fvtool(filt{p});
